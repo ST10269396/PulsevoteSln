@@ -11,8 +11,14 @@ const httpsOptions = {
     cert: fs.readFileSync('ssl/cert.pem'),
 };
 
-https.createServer(httpsOptions, app).listen(PORT, () => {
-    console.log('Server running at https://localhost:' + PORT);
+mongoose.connect(process.env.MONGO_URI)
+.then(() => {
+    https.createServer(httpsOptions, app).listen(PORT, () => {
+        console.log('Server running at https://localhost:' + PORT);
+    });
+})
+.catch((err) => {
+    console.error('MongoDB connection error:', err);
 });
 
 

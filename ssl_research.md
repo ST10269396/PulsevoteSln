@@ -1,19 +1,39 @@
-SSL/TLS Research and Reflection
+## SSL/TLS — Research and Notes
 
-Summary (what SSL/TLS is and why it matters)
-SSL/TLS encrypts traffic between browser and server so third parties can’t read or alter it. HTTPS is HTTP over TLS, authenticated by a certificate so clients know they’re talking to the right server. For polling apps, TLS protects votes, credentials, and session tokens from interception or tampering. Without it, attackers can eavesdrop, change results, inject scripts, or steal identities.
+### Table of Contents
+- [Overview](#overview)
+- [What is SSL/TLS?](#what-is-ssltls)
+- [Why HTTPS instead of HTTP?](#why-https-instead-of-http)
+- [Impact if SSL is missing](#impact-if-ssl-is-missing)
+- [Real‑world example](#real-world-example)
+- [Local dev setup we implemented](#local-dev-setup-we-implemented)
+- [Trusting the certificate on Windows](#trusting-the-certificate-on-windows)
+- [Reflection](#reflection)
 
-Real-world note: Sites that served login/API over plain HTTP have leaked credentials/session cookies, enabling account takeover. Misconfigured HTTPS (invalid certs, no HSTS) can expose users to downgrade or MITM attacks.
+### Overview
+SSL/TLS encrypts traffic between browser and server so third parties can’t read or alter it. HTTPS is HTTP over TLS with server authentication via a certificate.
 
-Local Dev Setup (implemented here)
-- Self-signed cert with SAN=localhost via OpenSSL.
+### What is SSL/TLS?
+It’s the cryptographic protocol that provides encryption and integrity for web traffic. Certificates (from a CA or self‑signed in dev) help clients verify the server’s identity.
+
+### Why HTTPS instead of HTTP?
+HTTPS prevents eavesdropping and tampering. For polling apps, it protects votes, credentials, and session tokens in transit.
+
+### Impact if SSL is missing
+Attackers can sniff credentials/tokens, change votes, inject scripts, or impersonate the server (MITM). HSTS helps enforce HTTPS.
+
+### Real‑world example
+Sites serving login or APIs over plain HTTP have leaked credentials/session cookies, leading to account takeover. Misconfigured HTTPS (invalid certs, missing HSTS) leaves users vulnerable to downgrade/MITM.
+
+### Local dev setup we implemented
+- Self‑signed cert with SAN=localhost via OpenSSL.
 - Backend HTTPS with `ssl/key.pem` + `ssl/cert.pem`.
-- Frontend (Vite) HTTPS dev server using same certs.
+- Frontend (Vite) HTTPS dev server using the same certs.
 - `ssl/` is .gitignored in both apps.
 
-Trusting the certificate on Windows (summary)
+### Trusting the certificate on Windows
 - Run `certmgr.msc` → Trusted Root Certification Authorities → Certificates → Import → pick `ssl/cert.pem` → finish → restart browser.
 
-Reflection (experience)
-Self-signed TLS shows warnings until trusted, but once imported it mirrors production workflows. It reminded me that TLS touches the app, dev server, and OS trust store. Avoid committing private keys and ensure all endpoints (including websockets) use HTTPS/WSS. In production, terminate TLS at a reverse proxy or platform with a trusted CA; keep cert management out of app code for safer rotation.
+### Reflection
+Self‑signed TLS shows warnings until trusted, but once imported it mirrors production workflows. TLS touches the app, dev server, and OS trust store. Avoid committing private keys and ensure all endpoints (including websockets) use HTTPS/WSS. In production, terminate TLS at a reverse proxy or platform with a trusted CA; keep cert management out of app code for safer rotation.
 

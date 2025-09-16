@@ -3,7 +3,7 @@ Secure, real-time polling web app built with the MERN stack.
 
 ## Table of Contents
 - [Overview](#overview)
-- [Foundations (Phase 01)](#foundations-phase-01)
+- [Phase 01: Setting up Foundations](#phase-01-setting-up-foundations)
   - [Backend](#backend-pulsevote-backend)
   - [Frontend](#frontend-pulsevote-frontend)
   - [Hygiene](#hygiene)
@@ -14,6 +14,11 @@ Secure, real-time polling web app built with the MERN stack.
   - [Run](#run)
   - [Trust the certificate (Windows)](#trust-the-certificate-windows)
   - [Notes](#notes)
+- [Phase 03: Adding Authentication with JWT](#phase-03-adding-authentication-with-jwt)
+  - [What’s been done](#whats-been-done)
+  - [Environment](#environment)
+  - [Endpoints](#endpoints)
+  - [Test with curl](#test-with-curl)
 - [Project Structure](#project-structure)
 - [Development Scripts](#development-scripts)
 - [Security Reflection](#security-reflection-)
@@ -23,7 +28,7 @@ Secure, real-time polling web app built with the MERN stack.
 ## Overview
 PulseVote is a secure, real-time polling web app. This repo currently contains the Phase 01 foundations: a secured Express backend and a Vite + React frontend with Tailwind CSS and daisyUI.
 
-## Foundations (Phase 01)
+## Phase 01: Setting up Foundations
 
 ### Backend (pulsevote-backend)
 - Prereqs: Node 20.18+ (works); recommended Node 20.19+ to align with frontend engines.
@@ -72,7 +77,9 @@ Pulsevote/
 ## Security Reflection :
 Security isn’t just a checkbox for polling apps; it’s what makes results worth trusting. If people can spoof identities or stuff the ballot with bots, the data becomes noise and decisions based on it are flawed. A common threat is automated bot voting via shared links or exposed endpoints, which we mitigate with rate limiting, link hardening, and verification steps.
 
-## Next Phases (roadmap
+## Next Phases (roadmap)
+- 01: Setting up Foundations
+- 02: Adding SSL
 - 03: Adding Authentication with JWT
 - 04: Adding Authentication on the frontend
 - 05: Securing your login
@@ -88,6 +95,7 @@ Security isn’t just a checkbox for polling apps; it’s what makes results wor
 ## Commits
 - Initial commit after folders created
 - Phase commit: "PHASE 01 - Setting up Foundations"
+
 
 ## Phase 02: Adding SSL (HTTPS)
 Purpose: run both backend and frontend over HTTPS locally using a self-signed certificate.
@@ -125,4 +133,45 @@ If the frontend can’t fetch the API:
 - Private keys aren't commited; `ssl/` is already in `.gitignore` for both frontend and backend.
 - See `ssl_research.md` for a short summary and reflection.
 
+
+## Phase 03: Adding Authentication with JWT
+Purpose: secure the API with stateless auth using JSON Web Tokens and store user profiles in MongoDB.
+
+### What’s been done
+- Installed deps: `bcrypt`, `jsonwebtoken` and `mongodb` driver if needed
+- `models/User.js` with email + hashed password
+- `controllers/authController.js` with `register` and `login`
+- `routes/authRoutes.js` exposing `/api/auth/register` and `/api/auth/login`
+- `middleware/authMiddleware.js` with `protect`
+- `app.js` wired CORS for `https://localhost:5173`, auth routes, and `/api/protected`
+- `server.js` connects to MongoDB before starting HTTPS server
+
+### Environment
+Add to `pulsevote-backend/.env`:
+```
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_long_random_secret
+```
+
+### Endpoints
+- POST `/api/auth/register` → `{ token }`
+- POST `/api/auth/login` → `{ token }`
+- GET `/api/protected` with `Authorization: Bearer <token>` → protected data
+
+### Test with Postman
+1. Register
+   - Method: POST
+   - URL: `https://localhost:5000/api/auth/register`
+   - Headers: `Content-Type: application/json`
+   - Body (raw JSON): `{ "email": "test@example.com", "password": "password123" }`
+2. Login
+   - Method: POST
+   - URL: `https://localhost:5000/api/auth/login`
+   - Headers: `Content-Type: application/json`
+   - Body (raw JSON): `{ "email": "test@example.com", "password": "password123" }`
+   - Copy the `token` from the response
+3. Protected
+   - Method: GET
+   - URL: `https://localhost:5000/api/protected`
+   - Header: `Authorization: Bearer <paste token>`
 
