@@ -13,7 +13,6 @@ Secure, real-time polling web app built with the MERN stack.
 - [Security Reflection](#security-reflection-to-complete)
 - [Next Phases (roadmap)](#next-phases-roadmap)
 - [Commits](#commits)
-- [Deliverables](#deliverables)
 
 ## Overview
 PulseVote is a secure, real-time polling web app. This repo currently contains the Phase 01 foundations: a secured Express backend and a Vite + React frontend with Tailwind CSS and daisyUI.
@@ -37,7 +36,7 @@ PulseVote is a secure, real-time polling web app. This repo currently contains t
 
 ### Hygiene
 - `.gitignore` includes: `node_modules`, `.env`, `dist` for both apps.
-- Audits: run `npm audit` in both apps; apply `npm audit fix` if needed.
+- Audits: ran `npm audit` in both apps.
 
 ### Verifications
 - Backend reachable at `http://localhost:5000/` and `/test`.
@@ -65,10 +64,9 @@ Pulsevote/
   - Dev server: `cd pulsevote-frontend && npm run dev`
 
 ## Security Reflection :
-Security isn’t just a checkbox for polling apps; it’s what makes results worth trusting. If people can spoof identities or stuff the ballot with bots, the data becomes noise and decisions based on it are flawed. We also handle responses that may be sensitive, so protecting privacy and transport encryption is non‑negotiable. A common threat is automated bot voting via shared links or exposed endpoints, which we mitigate with rate limiting, link hardening, and verification steps.
+Security isn’t just a checkbox for polling apps; it’s what makes results worth trusting. If people can spoof identities or stuff the ballot with bots, the data becomes noise and decisions based on it are flawed. A common threat is automated bot voting via shared links or exposed endpoints, which we mitigate with rate limiting, link hardening, and verification steps.
 
 ## Next Phases (roadmap)
-- 01: Setting up Foundations
 - 02: Adding SSL
 - 03: Adding Authentication with JWT
 - 04: Adding Authentication on the frontend
@@ -86,9 +84,4 @@ Security isn’t just a checkbox for polling apps; it’s what makes results wor
 - Initial commit after folders created
 - Phase commit: "PHASE 01 - Setting up Foundations"
 
-## Deliverables
-For class discussion:
 
-- A short written reflection (3–4 sentences):
-  - Why is security important for polling apps?
-  - List one potential threat to these apps.
