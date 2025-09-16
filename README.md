@@ -8,9 +8,15 @@ Secure, real-time polling web app built with the MERN stack.
   - [Frontend](#frontend-pulsevote-frontend)
   - [Hygiene](#hygiene)
   - [Verifications](#verifications)
+- [Phase 02: Adding SSL (HTTPS)](#phase-02-adding-ssl-https)
+  - [What you’ll do](#what-youll-do)
+  - [Commands (Git Bash)](#commands-git-bash)
+  - [Run](#run)
+  - [Trust the certificate (Windows)](#trust-the-certificate-windows)
+  - [Notes](#notes)
 - [Project Structure](#project-structure)
 - [Development Scripts](#development-scripts)
-- [Security Reflection](#security-reflection-to-complete)
+- [Security Reflection](#security-reflection-)
 - [Next Phases (roadmap)](#next-phases-roadmap)
 - [Commits](#commits)
 
@@ -66,8 +72,7 @@ Pulsevote/
 ## Security Reflection :
 Security isn’t just a checkbox for polling apps; it’s what makes results worth trusting. If people can spoof identities or stuff the ballot with bots, the data becomes noise and decisions based on it are flawed. A common threat is automated bot voting via shared links or exposed endpoints, which we mitigate with rate limiting, link hardening, and verification steps.
 
-## Next Phases (roadmap)
-- 02: Adding SSL
+## Next Phases (roadmap
 - 03: Adding Authentication with JWT
 - 04: Adding Authentication on the frontend
 - 05: Securing your login
@@ -83,5 +88,41 @@ Security isn’t just a checkbox for polling apps; it’s what makes results wor
 ## Commits
 - Initial commit after folders created
 - Phase commit: "PHASE 01 - Setting up Foundations"
+
+## Phase 02: Adding SSL (HTTPS)
+Purpose: run both backend and frontend over HTTPS locally using a self-signed certificate.
+
+### Whats been done 
+- Generate a self-signed cert for `localhost` with SAN.
+- Serve backend via HTTPS using the cert.
+- Serve frontend (Vite dev server) via HTTPS using the same cert.
+- Optionally trust the cert to remove browser warnings.
+
+### Commands (Git Bash)
+```bash
+cd pulsevote-backend
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+  -keyout ssl/key.pem -out ssl/cert.pem \
+  -config ssl/openssl.cnf -extensions v3_req
+
+# copy to frontend
+mkdir -p ../pulsevote-frontend/ssl
+cp ssl/key.pem ssl/cert.pem ../pulsevote-frontend/ssl/
+```
+
+### Run
+- Backend: `cd pulsevote-backend && npm run dev` → open `https://localhost:5000/`
+- Frontend: `cd pulsevote-frontend && npm run dev` → open `https://localhost:5173/`
+
+If the frontend can’t fetch the API:
+- Visit `https://localhost:5000` and click Advanced → Continue (unsafe), then refresh the frontend.
+- Ensure CORS allows the frontend: `app.use(cors({ origin: 'https://localhost:5173' }));`
+
+### Trust the certificate (Windows)
+- Win+R → `certmgr.msc` → Trusted Root Certification Authorities → Certificates → Import → select `ssl/cert.pem` → finish → restart browser.
+
+### Notes
+- Private keys aren't commited; `ssl/` is already in `.gitignore` for both frontend and backend.
+- See `ssl_research.md` for a short summary and reflection.
 
 

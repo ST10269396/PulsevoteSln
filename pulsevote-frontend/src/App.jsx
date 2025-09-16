@@ -5,7 +5,7 @@ function App() {
   const [apiStatus, setApiStatus] = useState(null)
 
   useEffect(() => {
-    fetch('http://localhost:5000/test')
+    fetch('https://localhost:5000/test')
       .then((r) => r.json())
       .then((data) => setApiStatus({ ok: true, data }))
       .catch((err) => setApiStatus({ ok: false, error: String(err) }))
