@@ -11,5 +11,8 @@ export default defineConfig({
       key: fs.readFileSync('ssl/key.pem'),
       cert: fs.readFileSync('ssl/cert.pem'),
     },
+    headers: {
+      'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self'; connect-src 'self' http://localhost:5000 https://localhost:5000;"
+    }
   },
 })

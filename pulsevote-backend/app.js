@@ -14,8 +14,8 @@ app.use(
       scriptSrc: ["'self'", "https://apis.google.com"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:"],
-      connectSrc: ["'self'", "http://localhost:5000"], // or whichever port you use
+      imgSrc: ["'self'"], // Removed data: to make it more restrictive for testing
+      connectSrc: ["'self'", "http://localhost:5000", "https://localhost:5000"], // Allow both HTTP and HTTPS
     },
   })
 );

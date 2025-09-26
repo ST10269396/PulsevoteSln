@@ -54,19 +54,19 @@ const HomePage = () => {
             {/* Violation 1: External script not in scriptSrc */}
             <div className="mb-2">
               <p className="text-sm">1. External script from unauthorized source:</p>
-              <script src="https://evil-site.com/malicious.js"></script>
+              <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
             </div>
             
             {/* Violation 2: External image not in imgSrc */}
             <div className="mb-2">
               <p className="text-sm">2. External image from unauthorized source:</p>
-              <img src="https://evil-site.com/malicious.jpg" alt="Should be blocked" className="w-20 h-20" />
+              <img src="https://httpbin.org/image/png" alt="Should be blocked" className="w-20 h-20" />
             </div>
             
             {/* Violation 3: External font not in fontSrc */}
             <div className="mb-2">
               <p className="text-sm">3. External font from unauthorized source:</p>
-              <link href="https://evil-site.com/malicious-font.css" rel="stylesheet" />
+              <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet" />
             </div>
             
             {/* Violation 4: External connection not in connectSrc */}
@@ -74,15 +74,33 @@ const HomePage = () => {
               <p className="text-sm">4. External API call to unauthorized source:</p>
               <button 
                 className="btn btn-sm btn-error" 
-                onClick={() => fetch('https://evil-site.com/api/malicious')}
+                onClick={() => fetch('https://api.github.com/users/octocat')}
               >
                 Test External API Call
               </button>
             </div>
             
-            <p className="text-xs text-warning mt-2">
-              Check browser console for CSP violation reports. These elements should be blocked.
-            </p>
+            {/* Violation 5: Inline script (should be blocked if CSP doesn't allow unsafe-inline) */}
+            <div className="mb-2">
+              <p className="text-sm">5. Inline script execution:</p>
+              <button 
+                className="btn btn-sm btn-error" 
+                onClick={() => {
+                  // This inline script should be blocked by CSP
+                  eval('alert("This should be blocked by CSP!")');
+                }}
+              >
+                Test Inline Script
+              </button>
+            </div>
+            
+            
+            
+            {/*  CSP Test */}
+            <div className="mt-4 p-2 bg-info/20 rounded">
+              <p className="text-xs font-bold"> CSP Test:</p>
+              <p className="text-xs">If the image above shows as broken (not loading), CSP is working! (Also see console for CSP violations)</p>
+            </div>
           </div>
         </div>
       </div>
