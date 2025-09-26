@@ -1,2 +1,87 @@
 @import "tailwindcss";
 @plugin "daisyui";
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-success {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes slide-out {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out;
+}
+
+.animate-pulse-success {
+  animation: pulse-success 0.6s ease-in-out;
+}
+
+.animate-slide-out {
+  animation: slide-out 0.2s ease-in-out;
+}
+
+
+input:focus,
+button:focus {
+  outline: 2px solid hsl(var(--p));
+  outline-offset: 2px;
+}
+
+
+.btn, .input, .checkbox, .link {
+  transition: all 0.2s ease-in-out;
+}
+
+.input-error {
+  border-color: hsl(var(--er));
+  box-shadow: 0 0 0 1px hsl(var(--er));
+}
+
+.input-success {
+  border-color: hsl(var(--su));
+  box-shadow: 0 0 0 1px hsl(var(--su));
+}
+
+.checkbox-error {
+  border-color: hsl(var(--er));
+}

@@ -23,6 +23,7 @@ const { protect } = require('./middleware/authMiddleware');
 app.get('/api/protected', protect, (req, res) => {
   res.json({
     message: `Welcome, user ${req.user.id}! You have accessed protected data.`,
+    user: { id: req.user.id }, // only returns the user id for now
     timestamp: new Date()
   });
 });

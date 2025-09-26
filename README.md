@@ -24,9 +24,14 @@ Secure, real-time polling web app built with the MERN stack.
   - [Environment](#environment)
   - [Endpoints](#endpoints)
   - [Test with Postman](#test-with-postman)
+- [Phase 04: Adding Authentication on the Frontend](#phase-04-adding-authentication-on-the-frontend)
+  - [What's been implemented](#whats-been-implemented)
+  - [Project Structure](#project-structure-1)
+  - [Authentication Flow](#authentication-flow)
+  - [Testing the Authentication](#testing-the-authentication)
 
 ## Overview
-PulseVote is a secure, real-time polling web app. This repo currently contains the Phase 01 foundations: a secured Express backend and a Vite + React frontend with Tailwind CSS and daisyUI.
+PulseVote is a secure, real-time polling web app. This repo contains a complete authentication system with HTTPS backend, JWT authentication, and a fully functional React frontend with login, registration, and protected routes using Tailwind CSS and DaisyUI.
 
 ## Phase 01: Setting up Foundations
 
@@ -78,10 +83,6 @@ Pulsevote/
 Security isn’t just a checkbox for polling apps; it’s what makes results worth trusting. If people can spoof identities or stuff the ballot with bots, the data becomes noise and decisions based on it are flawed. A common threat is automated bot voting via shared links or exposed endpoints, which we mitigate with rate limiting, link hardening, and verification steps.
 
 ## Next Phases (roadmap)
-- 01: Setting up Foundations
-- 02: Adding SSL
-- 03: Adding Authentication with JWT
-- 04: Adding Authentication on the frontend
 - 05: Securing your login
 - 06: Adding in CSP
 - 07: Adding RBAC
@@ -95,6 +96,9 @@ Security isn’t just a checkbox for polling apps; it’s what makes results wor
 ## Commits
 - Initial commit after folders created
 - Phase commit: "PHASE 01 - Setting up Foundations"
+- Phase commit: "PHASE 02 - Adding SSL (HTTPS)"
+- Phase commit: "PHASE 03 - Adding Authentication with JWT"
+- Phase commit: "PHASE 04 - Adding Authentication on the Frontend"
 
 
 ## Phase 02: Adding SSL (HTTPS)
@@ -174,4 +178,97 @@ JWT_SECRET=your_long_random_secret
    - Method: GET
    - URL: `https://localhost:5000/api/protected`
    - Header: `Authorization: Bearer <paste token>`
+
+
+## Phase 04: Adding Authentication on the Frontend
+Building complete authentication system on the frontend.
+
+### What's been implemented
+- **Complete Authentication Flow**: Login, register, logout with JWT token management
+- **Protected Routes**: Dashboard accessible only to authenticated users
+- **Dynamic Navigation**: Menu changes based on authentication state
+- **DaisyUI Toast Notifications**: Beautiful, consistent user feedback
+- **Form Validation**: Client-side validation with real-time feedback
+- **Error Handling**: Comprehensive error handling with specific messages
+- **Session Management**: Automatic token validation and cleanup
+
+### Project Structure
+```
+pulsevote-frontend/src/
+├── components/
+│   ├── Layout.jsx          # Navigation with conditional menu
+│   ├── Login.jsx           # Login form with validation
+│   ├── ProtectedRoute.jsx   # Route protection wrapper
+│   └── Register.jsx        # Registration form with password strength
+├── pages/
+│   ├── DashboardPage.jsx   # Protected dashboard
+│   ├── HomePage.jsx        # Public home page
+│   ├── LoginPage.jsx       # Login page wrapper
+│   ├── LogoutPage.jsx      # Logout with redirect
+│   └── RegisterPage.jsx    # Registration page wrapper
+├── contexts/
+│   └── AuthContext.jsx     # Authentication state management
+├── hooks/
+│   └── useAuth.js          # Custom hook for auth context
+└── utils/
+    ├── axios.js            # Axios configuration with interceptors
+    └── toast.js            # DaisyUI toast utility
+```
+
+### Authentication Flow
+
+1. **Registration**:
+   ```
+   User fills form → Validation → API call → Token received → 
+   Auto-login → Dashboard redirect
+   ```
+
+2. **Login**:
+   ```
+   User enters credentials → Validation → API call → Token stored → 
+   User info fetched → Dashboard redirect
+   ```
+
+3. **Protected Access**:
+   ```
+   User visits /dashboard → Check token → Valid? → Show dashboard
+   Invalid? → Redirect to login
+   ```
+
+4. **Logout**:
+   ```
+   User clicks logout → Clear token → Clear state → 
+   Show toast → Redirect to home
+   ```
+
+### Testing the Authentication
+
+1. **Start the servers**:
+   ```bash
+   # Backend
+   cd pulsevote-backend && npm start
+   
+   # Frontend  
+   cd pulsevote-frontend && npm run dev
+   ```
+
+2. **Test Registration**:
+   - Visit `https://localhost:5173/register`
+   - Fill out the form with valid email/password
+   - Should auto-login and redirect to dashboard
+
+3. **Test Login**:
+   - Visit `https://localhost:5173/login`
+   - Use registered credentials
+   - Should redirect to dashboard
+
+4. **Test Protected Routes**:
+   - Try visiting `https://localhost:5173/dashboard` while logged out
+   - Should redirect to login page
+
+5. **Test Logout**:
+   - Click user avatar → Logout
+   - Should show success toast and redirect to home
+
+
 
