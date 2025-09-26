@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const app = require('./app');
 const https = require('https');
 const fs = require('fs');
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 
 const PORT = process.env.PORT || 5000;
 

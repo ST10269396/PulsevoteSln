@@ -50,6 +50,11 @@ Secure, real-time polling web app built with the MERN stack.
    - [Rate Limiting Configuration](#rate-limiting-configuration)
    - [Testing with Postman](#testing-with-postman-1)
    - [Security Features](#security-features-1)
+- [Phase 09: Linting and Unit Testing](#phase-09-linting-and-unit-testing)
+   - [What's been implemented](#whats-been-implemented-2)
+   - [Linting and Testing Research Summary](#linting-and-testing-research-summary)
+   - [Configuration](#configuration)
+   - [Running Tests](#running-tests)
 
 
 ## Overview
@@ -105,7 +110,6 @@ Pulsevote/
 Security isn’t just a checkbox for polling apps; it’s what makes results worth trusting. If people can spoof identities or stuff the ballot with bots, the data becomes noise and decisions based on it are flawed. A common threat is automated bot voting via shared links or exposed endpoints, which we mitigate with rate limiting, link hardening, and verification steps.
 
 ## Next Phases (roadmap)
-- 09: Linting and Unit Testing in the API
 - 10: Dockerizing the API
 - 11: Pipelining the API with lint and render reports
 - 12: Pipelining with Newman and SonarQube
@@ -121,6 +125,7 @@ Security isn’t just a checkbox for polling apps; it’s what makes results wor
 - Phase commit: "PHASE 06 - Adding CSP with Helmet"
 - Phase commit: "PHASE 07 - Adding RBAC (Role-Based Access Control)"
 - Phase commit: "PHASE 08 - Adding Rate Limiting"
+- Phase commit: "PHASE 09 - Linting and Unit Testing"
 
 
 
@@ -527,4 +532,51 @@ See `rate_limiting_research.md` for detailed research on:
 - **Per-Endpoint Limits**: Different limits for registration vs login
 - **Standard Headers**: Provides observability for monitoring systems
 - **Graceful Degradation**: Clear error messages for rate-limited requests
+
+## Phase 09: Linting and Unit Testing
+Purpose: implement code quality tools and automated testing to ensure code reliability and maintainability.
+
+### What's been implemented
+- **ESLint Configuration**: Code linting with recommended rules and custom configurations
+- **Jest Testing Framework**: Unit testing with supertest for API endpoint testing
+- **Health Endpoint**: Simple health check endpoint for monitoring
+- **Automated Scripts**: npm scripts for running linting and tests
+- **Test Coverage**: Basic tests for health endpoint and authentication validation
+
+### Linting and Testing Research Summary
+See `linting_testing_research.md` for detailed research on:
+- What linting and unit testing are and why they're critical
+- How to implement linting and testing in Node.js APIs
+- Benefits of automation and CI/CD integration
+- Problems caused by flaky tests
+
+### Configuration
+
+**ESLint Configuration (`eslint.config.cjs`):**
+- Uses recommended JavaScript rules
+- Ignores common directories (node_modules, coverage, etc.)
+- Custom rules for unused variables
+- Jest globals for test files
+
+**Jest Configuration (`jest.config.js`):**
+- Node.js test environment
+- Test files in `test/**/*.test.js`
+- Verbose output for detailed test results
+
+### Running Tests
+
+**Linting:**
+```bash
+npm run lint
+```
+
+**Unit Tests:**
+```bash
+npm test
+```
+
+**Expected Results:**
+- Linting shows warnings for unused variables (non-blocking)
+- Tests pass with 3 test cases covering health and auth endpoints
+- All test suites pass successfully
 

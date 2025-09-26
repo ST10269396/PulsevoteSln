@@ -105,30 +105,23 @@ exports.login = async (req, res) => {
     return res.status(400).json({ message: "Invalid input", errors: errors.array() });
 
   const { email, password } = req.body;
-  console.log('Login attempt for email:', email);
   
   try {
     const user = await User.findOne({ email });
-    console.log('User found:', !!user);
     
     if (!user) {
-      console.log('No user found with email:', email);
       return res.status(400).json({ message: "Invalid credentials" });
     }
     
     const isPasswordValid = await user.comparePassword(password);
-    console.log('Password valid:', isPasswordValid);
     
     if (!isPasswordValid) {
-      console.log('Invalid password for user:', email);
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
     const token = generateToken(user);
-    console.log('Token generated for user:', user._id);
     res.json({ token });
   } catch (err) {
-    console.error('Login error:', err);
     res.status(500).json({ error: "Server error" });
   }
 };

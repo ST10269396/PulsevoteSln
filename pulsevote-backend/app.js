@@ -1,9 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
-const dotenv = require('dotenv');
-
-dotenv.config();
 
 const app = express();
 
@@ -57,6 +54,12 @@ app.get('/', (req, res) => {
 app.get('/test', (req, res) => {
     res.json({ status: 'ok', service: 'pulsevote-backend', timestamp: new Date().toISOString() });
 });
+
+app.get('/health', (req, res) => 
+    res.status(200).json({
+        ok: true,
+        ts: Date.now()
+    }));
 
 module.exports = app;
 
