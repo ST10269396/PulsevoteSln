@@ -29,9 +29,13 @@ Secure, real-time polling web app built with the MERN stack.
   - [Project Structure](#project-structure-1)
   - [Authentication Flow](#authentication-flow)
   - [Testing the Authentication](#testing-the-authentication)
- - [Phase 05: Securing your login](#phase-05-securing-your-login)
+- [Phase 05: Securing your login](#phase-05-securing-your-login)
    - [Frontend hardening](#frontend-hardening)
    - [Backend validation](#backend-validation)
+- [Phase 06: Adding CSP with Helmet](#phase-06-adding-csp-with-helmet)
+   - [What is Helmet.js?](#what-is-helmetjs)
+   - [CSP Implementation](#csp-implementation)
+
 
 ## Overview
 PulseVote is a secure, real-time polling web app. This repo contains a complete authentication system with HTTPS backend, JWT authentication, and a fully functional React frontend with login, registration, and protected routes using Tailwind CSS and DaisyUI.
@@ -86,8 +90,6 @@ Pulsevote/
 Security isn’t just a checkbox for polling apps; it’s what makes results worth trusting. If people can spoof identities or stuff the ballot with bots, the data becomes noise and decisions based on it are flawed. A common threat is automated bot voting via shared links or exposed endpoints, which we mitigate with rate limiting, link hardening, and verification steps.
 
 ## Next Phases (roadmap)
-- 05: Securing your login
-- 06: Adding in CSP
 - 07: Adding RBAC
 - 08: Rate Limiting
 - 09: Linting and Unit Testing in the API
@@ -103,6 +105,7 @@ Security isn’t just a checkbox for polling apps; it’s what makes results wor
 - Phase commit: "PHASE 03 - Adding Authentication with JWT"
 - Phase commit: "PHASE 04 - Adding Authentication on the Frontend"
 - Phase commit: "PHASE 05 - Securing your login"
+- Phase commit: "PHASE 06 - Adding CSP with Helmet"
 
 
 
@@ -294,5 +297,50 @@ Purpose: add input validation on both client and server to reduce bad requests a
 - Both `register` and `login` in `pulsevote-backend/controllers/authController.js` now use:
   - `const { validationResult } = require('express-validator')`
   - Return `400 { message: "Invalid input", errors: [...] }` when validation fails
+
+## Phase 06: Adding CSP with Helmet
+Implement Content Security Policy (CSP) to prevent XSS attacks and unauthorized resource loading on the system.
+
+### What is Helmet.js?
+Helmet.js is a security middleware for Express that sets various HTTP headers to protect against common web vulnerabilities:
+
+**Default Security Headers:**
+- **X-Content-Type-Options**: Prevents MIME-sniffing attacks
+- **X-Frame-Options**: Mitigates clickjacking attacks
+- **X-XSS-Protection**: Enables browser XSS filter
+- **Strict-Transport-Security (HSTS)**: Enforces HTTPS connections
+- **Content-Security-Policy (CSP)**: Controls resource loading sources
+
+**Benefits for our tech stack:**
+- Protects React frontend from XSS attacks
+- Prevents unauthorized scripts from executing
+- Ensures secure communication between frontend and backend
+- Blocks malicious resource loading attempts
+
+### CSP Implementation
+Added CSP configuration in `pulsevote-backend/app.js`:
+
+```javascript
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "https://apis.google.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:"],
+      connectSrc: ["'self'", "http://localhost:5000"],
+    },
+  })
+);
+```
+
+**What this CSP does:**
+- `defaultSrc: ["'self'"]` - Only allow resources from same origin by default
+- `scriptSrc` - Allow scripts from same origin + Google APIs
+- `styleSrc` - Allow styles from same origin + inline styles + Google Fonts
+- `fontSrc` - Allow fonts from same origin + Google Fonts CDN
+- `imgSrc` - Allow images from same origin + data URIs
+- `connectSrc` - Allow API calls to same origin + backend port
 
 

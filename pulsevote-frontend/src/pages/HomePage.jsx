@@ -46,6 +46,44 @@ const HomePage = () => {
               )}
             </div>
           )}
+
+          {/* CSP Violation Tests - These should be blocked by the CSP policy */}
+          <div className="mt-8 p-4 bg-warning/20 rounded-lg">
+            <h3 className="text-lg font-semibold mb-2">CSP Violation Tests (Should be blocked):</h3>
+            
+            {/* Violation 1: External script not in scriptSrc */}
+            <div className="mb-2">
+              <p className="text-sm">1. External script from unauthorized source:</p>
+              <script src="https://evil-site.com/malicious.js"></script>
+            </div>
+            
+            {/* Violation 2: External image not in imgSrc */}
+            <div className="mb-2">
+              <p className="text-sm">2. External image from unauthorized source:</p>
+              <img src="https://evil-site.com/malicious.jpg" alt="Should be blocked" className="w-20 h-20" />
+            </div>
+            
+            {/* Violation 3: External font not in fontSrc */}
+            <div className="mb-2">
+              <p className="text-sm">3. External font from unauthorized source:</p>
+              <link href="https://evil-site.com/malicious-font.css" rel="stylesheet" />
+            </div>
+            
+            {/* Violation 4: External connection not in connectSrc */}
+            <div className="mb-2">
+              <p className="text-sm">4. External API call to unauthorized source:</p>
+              <button 
+                className="btn btn-sm btn-error" 
+                onClick={() => fetch('https://evil-site.com/api/malicious')}
+              >
+                Test External API Call
+              </button>
+            </div>
+            
+            <p className="text-xs text-warning mt-2">
+              Check browser console for CSP violation reports. These elements should be blocked.
+            </p>
+          </div>
         </div>
       </div>
     </div>
