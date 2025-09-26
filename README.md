@@ -29,6 +29,9 @@ Secure, real-time polling web app built with the MERN stack.
   - [Project Structure](#project-structure-1)
   - [Authentication Flow](#authentication-flow)
   - [Testing the Authentication](#testing-the-authentication)
+ - [Phase 05: Securing your login](#phase-05-securing-your-login)
+   - [Frontend hardening](#frontend-hardening)
+   - [Backend validation](#backend-validation)
 
 ## Overview
 PulseVote is a secure, real-time polling web app. This repo contains a complete authentication system with HTTPS backend, JWT authentication, and a fully functional React frontend with login, registration, and protected routes using Tailwind CSS and DaisyUI.
@@ -99,6 +102,8 @@ Security isn’t just a checkbox for polling apps; it’s what makes results wor
 - Phase commit: "PHASE 02 - Adding SSL (HTTPS)"
 - Phase commit: "PHASE 03 - Adding Authentication with JWT"
 - Phase commit: "PHASE 04 - Adding Authentication on the Frontend"
+- Phase commit: "PHASE 05 - Securing your login"
+
 
 
 ## Phase 02: Adding SSL (HTTPS)
@@ -270,5 +275,24 @@ pulsevote-frontend/src/
    - Click user avatar → Logout
    - Should show success toast and redirect to home
 
+
+
+
+## Phase 05: Securing your login
+Purpose: add input validation on both client and server to reduce bad requests and improve security.
+
+### Frontend hardening
+- Login form enforces:
+  - Email format: `/^[^\s@]+@[^\s@]+\.[^\s@]+$/`
+  - Strong password: at least 8 chars, includes letters and numbers
+- Register form already validates email format, password strength and confirmation.
+
+### Backend validation
+- Added `express-validator` checks in `pulsevote-backend/routes/authRoutes.js`:
+  - `POST /api/auth/register` validates/normalizes `email` and enforces strong `password`
+  - `POST /api/auth/login` validates/normalizes `email` and requires non-empty `password`
+- Both `register` and `login` in `pulsevote-backend/controllers/authController.js` now use:
+  - `const { validationResult } = require('express-validator')`
+  - Return `400 { message: "Invalid input", errors: [...] }` when validation fails
 
 

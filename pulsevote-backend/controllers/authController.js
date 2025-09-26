@@ -1,10 +1,15 @@
 const jwt = require("jsonwebtoken");
+const { validationResult } = require("express-validator");
 const User = require("../models/User");
 
 const generateToken = (userId) =>
   jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
 exports.register = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty())
+    return res.status(400).json({ message: "Invalid input", errors: errors.array() });
+
   const { email, password } = req.body;
   try {
     const existing = await User.findOne({ email });
@@ -19,6 +24,10 @@ exports.register = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty())
+    return res.status(400).json({ message: "Invalid input", errors: errors.array() });
+
   const { email, password } = req.body;
   console.log('Login attempt for email:', email);
   
