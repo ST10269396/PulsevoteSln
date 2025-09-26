@@ -90,7 +90,7 @@ Pulsevote/
 Security isn’t just a checkbox for polling apps; it’s what makes results worth trusting. If people can spoof identities or stuff the ballot with bots, the data becomes noise and decisions based on it are flawed. A common threat is automated bot voting via shared links or exposed endpoints, which we mitigate with rate limiting, link hardening, and verification steps.
 
 ## Next Phases (roadmap)
-- 07: Adding RBAC
+- 07: Adding RBAC ✅
 - 08: Rate Limiting
 - 09: Linting and Unit Testing in the API
 - 10: Dockerizing the API
@@ -106,6 +106,7 @@ Security isn’t just a checkbox for polling apps; it’s what makes results wor
 - Phase commit: "PHASE 04 - Adding Authentication on the Frontend"
 - Phase commit: "PHASE 05 - Securing your login"
 - Phase commit: "PHASE 06 - Adding CSP with Helmet"
+- Phase commit: "PHASE 07 - Adding RBAC (Role-Based Access Control)"
 
 
 
@@ -342,5 +343,135 @@ app.use(
 - `fontSrc` - Allow fonts from same origin + Google Fonts CDN
 - `imgSrc` - Allow images from same origin + data URIs
 - `connectSrc` - Allow API calls to same origin + backend port
+
+## Phase 07: Adding RBAC (Role-Based Access Control)
+Purpose: implement comprehensive role-based access control with organizations, polls, and secure voting system.
+
+### What's been implemented
+- **Role-Based Authentication**: Three user roles (Admin, Manager, User) with hierarchical permissions
+- **Organisation Management**: Create organizations, join via codes, manage memberships
+- **Poll System**: Create polls within organizations, vote securely, view results
+- **Security Controls**: Role checks, membership validation, duplicate vote prevention
+- **JWT Enhancement**: Tokens now include user roles and organization memberships
+
+### RBAC Research Summary
+See `rbac_research.md` for detailed research on:
+- What RBAC is and why it's important
+- How different roles affect access in PulseVote
+- Security implications of improper RBAC implementation
+- Real-world examples of RBAC failures (Target data breach)
+
+### User Roles & Permissions
+
+**Admin Role:**
+- Create other admins and managers
+- Full system access
+- Override organization-level restrictions
+
+**Manager Role:**
+- Create and manage organizations
+- Generate join codes for organizations
+- Create polls within their organizations
+- Open/close polls
+- View all polls in their organizations
+
+**User Role:**
+- Join organizations via join codes
+- Vote on polls within organizations
+- View poll results for organizations they belong to
+
+### API Endpoints
+
+**Authentication:**
+- `POST /api/auth/register-user` - Register as regular user
+- `POST /api/auth/register-manager` - Register manager (admin only)
+- `POST /api/auth/register-admin` - Register admin (first admin or admin only)
+- `POST /api/auth/login` - Login with role information
+
+**Organizations:**
+- `POST /api/organisations/create-organisation` - Create organization (manager+)
+- `POST /api/organisations/generate-join-code/:organisationId` - Generate join code (manager+)
+- `POST /api/organisations/join-organisation` - Join organization with code
+
+**Polls:**
+- `POST /api/polls/create-poll` - Create poll (manager+)
+- `POST /api/polls/vote/:pollId` - Vote on poll (user+)
+- `GET /api/polls/get-poll-results/:pollId` - View poll results (member+)
+- `GET /api/polls/get-polls/:organisationId` - List organization polls
+- `POST /api/polls/close/:pollId` - Close poll (manager+)
+- `POST /api/polls/open/:pollId` - Open poll (manager+)
+
+### Database Models
+
+**User Model:**
+```javascript
+{
+  email: String,
+  password: String (hashed),
+  roles: [{
+    organisationId: ObjectId (ref: Organisation),
+    role: String (enum: ["admin", "manager", "user"])
+  }]
+}
+```
+
+**Organisation Model:**
+```javascript
+{
+  name: String (unique),
+  joinCode: String (unique, auto-generated),
+  createdBy: ObjectId (ref: User),
+  members: [ObjectId] (ref: User)
+}
+```
+
+**Poll Model:**
+```javascript
+{
+  organisationId: ObjectId (ref: Organisation),
+  question: String,
+  options: [String],
+  createdBy: ObjectId (ref: User),
+  status: String (enum: ["open", "closed"]),
+  votes: [{
+    userId: ObjectId (ref: User),
+    optionIndex: Number
+  }]
+}
+```
+
+### Testing with Postman
+
+1. **Import the test collection:**
+   - Import `pulsevote-backend/postman_tests.json` into Postman
+   - Update the variables section with your test credentials
+
+2. **Test sequence:**
+   - Register admin → Register manager → Register user
+   - Create organization → Join organization
+   - Create poll → Vote on poll → View results
+   - Test poll management (close/open)
+   - Test security restrictions
+
+3. **Expected test results:**
+   - All 13 test requests should pass
+   - Role-based access controls should be enforced
+   - Duplicate votes should be prevented
+   - Closed polls should reject new votes
+
+### Security Features
+- **Role Validation**: Middleware checks user roles before allowing actions
+- **Organization Membership**: Users can only access polls from organizations they belong to
+- **Vote Integrity**: One vote per user per poll, enforced at database level
+- **Admin Override**: Admins can access any organization's data
+- **Join Code Security**: Cryptographically secure random join codes
+
+### Environment Variables
+Ensure your `.env` file includes:
+```
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_long_random_secret
+PORT=5000
+```
 
 
