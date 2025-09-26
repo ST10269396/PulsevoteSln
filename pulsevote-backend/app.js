@@ -29,6 +29,14 @@ app.use(express.json());
 const authRoutes = require('./routes/authRoutes');
 app.use('/api/auth', authRoutes);
 
+// Organisation routes
+const organisationRoutes = require('./routes/organisationRoutes');
+app.use('/api/organisations', organisationRoutes);
+
+// Poll routes
+const pollRoutes = require('./routes/pollRoutes');
+app.use('/api/polls', pollRoutes);
+
 // Protected endpoint
 const { protect } = require('./middleware/authMiddleware');
 app.get('/api/protected', protect, (req, res) => {
