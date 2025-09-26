@@ -38,6 +38,10 @@ exports.registerManager = async (req, res) => {
     return res.status(400).json({ message: "Invalid input", errors: errors.array() });
 
   try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ message: "User not authenticated" });
+    }
+
     const adminUser = await User.findById(req.user.id);
     if (!adminUser || !adminUser.roles.some(r => r.role === "admin")) {
       return res.status(403).json({ message: "Only admins can create managers" });

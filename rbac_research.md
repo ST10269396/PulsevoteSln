@@ -3,7 +3,7 @@
 ## What is RBAC?
 Role-Based Access Control (RBAC) is a security model that restricts system access based on users' roles within an organization. Each role is associated with specific permissions, allowing users to perform only the actions pertinent to their responsibilities. This approach simplifies permission management by grouping access rights into roles rather than assigning them individually.
 
-## Why is RBAC important in web applications?
+## Why RBAC is important 
 Implementing RBAC in web applications is crucial for maintaining security and operational efficiency. It ensures that users can access only the resources necessary for their tasks, reducing the risk of unauthorized actions and potential data breaches. By aligning access controls with organizational structures, RBAC facilitates easier management and auditing of user permissions.
 
 ## How could different user roles affect access in PulseVote?

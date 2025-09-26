@@ -3,6 +3,11 @@ const User = require("../models/User");
 const requireRole = (role) => {
   return async (req, res, next) => {
     try {
+      // Check if req.user exists and has id
+      if (!req.user || !req.user.id) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
       const user = await User.findById(req.user.id);
       if (!user) return res.status(401).json({ message: "User not found" });
 
@@ -24,7 +29,8 @@ const requireRole = (role) => {
 
       next();
     } catch (err) {
-      res.status(500).json({ error: "Server error"});
+      console.error("Role middleware error:", err);
+      res.status(500).json({ error: "Server error: " + err.message });
     }
   };
 };

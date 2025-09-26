@@ -3,6 +3,7 @@ const { body } = require("express-validator");
 const { registerUser, registerManager, registerAdmin, login } = require("../controllers/authController");
 const { protect } = require("../middleware/authMiddleware");
 const { requireRole } = require("../middleware/roleMiddleware");
+const { registerLimiter, loginLimiter } = require("../middleware/rateLimiter");
 const router = express.Router();
 
 // Validators
@@ -23,9 +24,10 @@ const passwordValidator = body("password")
   .escape();
 
 // remove /register endpoint and include these ones.
-router.post("/register-user", [emailValidator, passwordStrongValidator], registerUser);
-router.post("/register-manager", protect, requireRole("admin"), [emailValidator, passwordStrongValidator], registerManager);
-router.post("/register-admin", [emailValidator, passwordStrongValidator], registerAdmin);
-router.post("/login", [emailValidator, passwordValidator], login);
+router.post("/register-user", registerLimiter, [emailValidator, passwordStrongValidator], registerUser);
+router.post("/register-manager", protect, requireRole("admin"), registerLimiter, [emailValidator, passwordStrongValidator], registerManager);
+router.post("/register-admin", registerLimiter, [emailValidator, passwordStrongValidator], registerAdmin);
+
+router.post("/login", loginLimiter, [emailValidator, passwordValidator], login);
 
 module.exports = router;

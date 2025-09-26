@@ -7,6 +7,9 @@ dotenv.config();
 
 const app = express();
 
+// Trust proxy for accurate IP detection behind reverse proxies/load balancers
+app.set('trust proxy', 1);
+
 app.use(
   helmet.contentSecurityPolicy({
     directives: {

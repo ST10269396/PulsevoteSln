@@ -35,6 +35,21 @@ Secure, real-time polling web app built with the MERN stack.
 - [Phase 06: Adding CSP with Helmet](#phase-06-adding-csp-with-helmet)
    - [What is Helmet.js?](#what-is-helmetjs)
    - [CSP Implementation](#csp-implementation)
+- [Phase 07: Adding RBAC (Role-Based Access Control)](#phase-07-adding-rbac-role-based-access-control)
+   - [What's been implemented](#whats-been-implemented)
+   - [RBAC Research Summary](#rbac-research-summary)
+   - [User Roles & Permissions](#user-roles--permissions)
+   - [API Endpoints](#api-endpoints)
+   - [Database Models](#database-models)
+   - [Testing with Postman](#testing-with-postman)
+   - [Security Features](#security-features)
+   - [Environment Variables](#environment-variables)
+- [Phase 08: Adding Rate Limiting](#phase-08-adding-rate-limiting)
+   - [What's been implemented](#whats-been-implemented-1)
+   - [Rate Limiting Research Summary](#rate-limiting-research-summary)
+   - [Rate Limiting Configuration](#rate-limiting-configuration)
+   - [Testing with Postman](#testing-with-postman-1)
+   - [Security Features](#security-features-1)
 
 
 ## Overview
@@ -90,8 +105,6 @@ Pulsevote/
 Security isn’t just a checkbox for polling apps; it’s what makes results worth trusting. If people can spoof identities or stuff the ballot with bots, the data becomes noise and decisions based on it are flawed. A common threat is automated bot voting via shared links or exposed endpoints, which we mitigate with rate limiting, link hardening, and verification steps.
 
 ## Next Phases (roadmap)
-- 07: Adding RBAC ✅
-- 08: Rate Limiting
 - 09: Linting and Unit Testing in the API
 - 10: Dockerizing the API
 - 11: Pipelining the API with lint and render reports
@@ -107,6 +120,7 @@ Security isn’t just a checkbox for polling apps; it’s what makes results wor
 - Phase commit: "PHASE 05 - Securing your login"
 - Phase commit: "PHASE 06 - Adding CSP with Helmet"
 - Phase commit: "PHASE 07 - Adding RBAC (Role-Based Access Control)"
+- Phase commit: "PHASE 08 - Adding Rate Limiting"
 
 
 
@@ -445,6 +459,7 @@ See `rbac_research.md` for detailed research on:
 1. **Import the test collection:**
    - Import `pulsevote-backend/postman_tests.json` into Postman
    - Update the variables section with your test credentials
+   - **Note**: Tests use `https://localhost:5000` (HTTPS with SSL)
 
 2. **Test sequence:**
    - Register admin → Register manager → Register user
@@ -459,19 +474,57 @@ See `rbac_research.md` for detailed research on:
    - Duplicate votes should be prevented
    - Closed polls should reject new votes
 
+## Phase 08: Adding Rate Limiting
+Purpose: implement rate limiting to protect authentication endpoints from brute force attacks and automated abuse.
+
+### What's been implemented
+- **Registration Rate Limiting**: 5 attempts per IP per 15 minutes
+- **Login Rate Limiting**: 5 attempts per IP+email combination per 10 minutes
+- **Proxy-Aware Configuration**: Accurate IP detection behind reverse proxies
+- **Standard Rate Limit Headers**: `RateLimit-Limit`, `RateLimit-Remaining` for observability
+- **Consistent Error Responses**: 429 status with clear error messages
+
+### Rate Limiting Research Summary
+See `rate_limiting_research.md` for detailed research on:
+- What rate limiting is and why it's critical for authentication endpoints
+- Differences between per-IP and per-identifier limits
+- How reverse proxies affect IP detection and rate limiting accuracy
+- Safe defaults vs. production-ready settings
+
+### Rate Limiting Configuration
+
+**Registration Limiter:**
+- **Window**: 15 minutes
+- **Limit**: 5 attempts per IP
+- **Key**: IP address only
+- **Headers**: Standard rate limit headers enabled
+
+**Login Limiter:**
+- **Window**: 10 minutes  
+- **Limit**: 5 attempts per IP+email combination
+- **Key**: IP address + email address
+- **Skip Successful**: Only counts failed attempts
+- **Headers**: Standard rate limit headers enabled
+
+### Testing with Postman
+
+1. **Import the rate limit test collection:**
+   - Import `pulsevote-backend/rate_limit_tests.json` into Postman
+   - Run the "Looped Register Rate Limit Test" - should hit 429 after 5 attempts
+   - Run the "Looped Login Rate Limit Test" - should hit 429 after 5 attempts
+
+2. **Expected behavior:**
+   - First 5 requests return normal responses (200/400/201)
+   - 6th request returns 429 "Too many attempts" error
+   - Rate limit headers show remaining attempts
+   - Different email addresses don't affect registration limits (IP-based)
+   - Same email affects login limits (IP+email based)
+
 ### Security Features
-- **Role Validation**: Middleware checks user roles before allowing actions
-- **Organization Membership**: Users can only access polls from organizations they belong to
-- **Vote Integrity**: One vote per user per poll, enforced at database level
-- **Admin Override**: Admins can access any organization's data
-- **Join Code Security**: Cryptographically secure random join codes
-
-### Environment Variables
-Ensure your `.env` file includes:
-```
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_long_random_secret
-PORT=5000
-```
-
+- **Brute Force Protection**: Prevents automated password guessing attacks
+- **Account Creation Abuse Prevention**: Limits automated account creation
+- **Proxy-Aware**: Works correctly behind load balancers and reverse proxies
+- **Per-Endpoint Limits**: Different limits for registration vs login
+- **Standard Headers**: Provides observability for monitoring systems
+- **Graceful Degradation**: Clear error messages for rate-limited requests
 
